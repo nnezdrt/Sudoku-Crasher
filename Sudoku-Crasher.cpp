@@ -33,7 +33,7 @@ void find(int now)
 		return;
 	}
 	int nowrow=(now-1)/9+1,nowcol=(now-1)%9+1;
-	if (map[nowrow][nowcol]) //已被占用
+	if (map[nowrow][nowcol]) //the used block
 	{
 		find(now+1);
 	}

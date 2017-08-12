@@ -1,5 +1,4 @@
 # Sudoku-Crasher
 A cheat for Sudoku, just for fun.
 
-Function:
-  Output the answer of a Sudoku if it has only one answer.
+You should input the entire puzzle (81 numbers), and the emptyblock is 0.

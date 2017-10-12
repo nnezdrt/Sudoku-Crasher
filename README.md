@@ -1,6 +1,2 @@
-# Sudoku-Crasher
-in 17
-
-A cheat for Sudoku, just for fun.
-
-You should input the entire puzzle (81 numbers), and the emptyblock is 0.
+# Essay
+Some of my little projects,code in free  time,just for fun.

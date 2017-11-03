@@ -5,7 +5,7 @@
 *Data File Name: data.txt
 *
 *For each line in file:
-*id name age grade level qq password isAMan
+*id name age grade level qq phone password isAMan
 *
 *About level: 
 *low level users can't edit/add/delete higher level users
@@ -18,13 +18,14 @@
 using namespace std;
 
 #define MAXUSER 10000
+#define GOD 9999
 
 struct data
 {
 	int id,age,grade,level;
-	string qq,name,password;
+	string qq,phone,name,password;
 	bool used,isAMan;
-	void init();
+	void init(int);
 	void show();
 	void welcomeShow();
 }user[MAXUSER+1],currentUser;
@@ -197,8 +198,7 @@ void addUser()
 	{
 		if (!user[i].used)
 		{
-			user[i].id=i;
-			user[i].init();
+			user[i].init(i);
 			t[++t[0].id]=user[i];
 			cout << "No." << i << " added\n";
 		}
@@ -226,7 +226,7 @@ void modifyUser()
 	{
 		temp=user[temp.id];
 		user[temp.id].show();
-		if (temp.level > currentUser.level || temp.id != currentUser.id) //need higher level
+		if (temp.level > currentUser.level || (temp.id != currentUser.id && temp.level==currentUser.level)) //need higher level
 		{
 			cout << "No enough level to edit the user.\n";
 			return;
@@ -313,37 +313,51 @@ void modifyUser()
 		}
 	}
 	//level
-	cout << "level:" << temp.level << ' ';
-	ch=getchar();
-	if (ch != '\n')
+	if (temp.id != currentUser.id) //can't modify your own level
 	{
-		if (ch <= '9' && ch >= '0') //legal input
+		cout << "level:" << temp.level << ' ';
+		ch=getchar();
+		if (ch != '\n')
 		{
-			if (currentUser.level >= ch-'0') //suit level
+			if (ch <= '9' && ch >= '0') //legal input
 			{
-				temp.level=ch-'0';
+				if (currentUser.level >= ch-'0') //suit level
+				{
+					temp.level=ch-'0';
+				}
+				else
+				{
+					cout << "can't give higher level.\n" << endl;
+				}
 			}
 			else
 			{
-				cout << "can't give higher level.\n" << endl;
+				currentState=InputError;
+				showMessage();
+			}
+			while (getchar() != '\n');
+		}
+		//qq
+		cout << "qq:" << temp.qq << ' ';
+		ch=getchar();
+		if (ch != '\n')
+		{
+			temp.qq=ch;
+			while ((ch=getchar()) != '\n')
+			{
+				temp.qq+=ch;
 			}
 		}
-		else
-		{
-			currentState=InputError;
-			showMessage();
-		}
-		while (getchar() != '\n');
 	}
-	//qq
-	cout << "qq:" << temp.qq << ' ';
+	//phone
+	cout << "phone:" << temp.phone << ' ';
 	ch=getchar();
-	if (ch != '\n')
+	if (ch!='\n')
 	{
-		temp.qq=ch;
+		temp.phone=ch;
 		while ((ch=getchar()) != '\n')
 		{
-			temp.qq+=ch;
+			temp.phone+=ch;
 		}
 	}
 	//isAMan
@@ -551,7 +565,6 @@ void loginGuard()
 	while (1)
 	{
 		ch=getch();
-
 		if (ch=='1')
 		{
 			_login();
@@ -658,7 +671,7 @@ void _register()
 		{
 			if (_registerCheck())
 			{
-				user[currentUser.id].init();
+				user[currentUser.id].init(currentUser.id);
 				user[currentUser.id].password=currentUser.password;
 				break;
 			}
@@ -747,13 +760,13 @@ void showMessage()
 
 void data::show()
 {//to be continued;
-	cout << "ID:" << id << " name:" << name << ' ';
+	cout << "ID:" << id << " name:" << name << " level:" << level;
 	if (isAMan)
-		cout << "Male\n";
+		cout << " Male\n";
 	else
-		cout << "Female\n";
-	cout << "age:" << age << ' ' << "grade:" << grade << endl;
-	cout << "QQ:" << qq << ' ' << "level:" << level << endl;
+		cout << " Female\n";
+	cout << "age:" << age << ' ' << " grade:" << grade << endl;
+	cout << "QQ:" << qq << ' ' << " phone:" << phone << endl;
 }
 
 void data::welcomeShow()
@@ -761,14 +774,16 @@ void data::welcomeShow()
 	cout << "Welcome,No." << id << ' ' << name << ' ' << "level: " << level << endl;
 }
 
-void data::init()
+void data::init(int theID=0)
 {
+	id=theID;
 	used=true;
 	name="x";
 	age=0;
 	grade=0;
 	level=0;
 	qq="qq";
+	phone="phone";
 	isAMan=false;
 	password=initPassword;
 }
@@ -783,8 +798,11 @@ void loadFile()
 {
 	ifstream in;
 	in.open("data.txt");
-	if (!in.is_open())
+	if (!in.is_open()) //no file means first login.
 	{
+		user[GOD].init(GOD);
+		user[GOD].level=9;
+		t[++t[0].id]=user[GOD];
 		cout << "no data.txt\n";
 	}
 	else
@@ -795,7 +813,7 @@ void loadFile()
 			user[id].id=id;
 			user[id].used=true;
 			in >> user[id].name >> user[id].age >> user[id].grade;
-			in >> user[id].level >> user[id].qq >> user[id].password;
+			in >> user[id].level >> user[id].qq >> user[id].phone >> user[id].password;
 			in >> user[id].isAMan;
 			t[++t[0].id]=user[id];
 		}
@@ -813,7 +831,7 @@ void saveFile()
 		{
 			out << user[i].id << ' ' << user[i].name << ' ' << user[i].age << ' ';
 			out << user[i].grade << ' ' << user[i].level << ' ' << user[i].qq << ' ';
-			out << user[i].password << ' ' << user[i].isAMan << '\n';
+			out << user[i].phone << ' ' << user[i].password << ' ' << user[i].isAMan << '\n';
 		}
 	}
 	out.close();

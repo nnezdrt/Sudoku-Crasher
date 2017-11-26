@@ -1,3 +1,4 @@
+//trie
 #include <cstdio>
 #include <cstring>
 struct node

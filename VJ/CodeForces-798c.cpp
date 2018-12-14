@@ -32,3 +32,4 @@ int main(){
 	printf("YES\n%d\n",ans);
 	return 0;
 }
+ 
